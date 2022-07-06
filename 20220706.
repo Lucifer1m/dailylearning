@@ -1,0 +1,177 @@
+# 20220706
+### Map和Set的区别
+Map
+
+Map是一组键值对的结构，具有极快的查找速度。
+
+借用廖雪峰老师的例子，假设要根据同学的名字查找对应的成绩，如果用Array实现，需要两个Array：
+```js
+const names = ['Michael', 'Bob', 'Tracy'];
+const scores = [95, 75, 85];
+```
+给定一个名字，要查找对应的成绩，就先要在names中找到对应的位置，再从scores取出对应的成绩，Array越长，耗时越长。
+
+如果用Map实现，只需要一个“名字”-“成绩”的对照表，直接根据名字查找成绩，无论这个表有多大，查找速度都不会变慢。用JavaScript写一个Map如下：
+```js
+const m = new Map([['Michael', 95], ['Bob', 75], ['Tracy', 85]]);
+m.get('Michael'); // 95
+```
+初始化Map需要一个二维数组，或者直接初始化一个空Map。
+```js
+var m = new Map();
+```
+map的其他方法
+```js
+var m = new Map(); // 初始化一个空Map
+m.set('key', value); // 添加新的key-value
+m.has('key'); // 是否存在一个指定key
+m.get('key'); // 是否存在一个指定key
+m.delete('key'); // 删除key
+```
+
+Set
+
+Set和Map类似，也是一组key的集合，但不存储value，特点是在Set中，没有重复的key。
+
+要创建一个Set，需要提供一个Array作为输入，或者直接创建一个空Set：
+
+```js
+var s1 = new Set(); // 空Set
+var s2 = new Set([1, 2, 3]); // 含1, 2, 3
+```
+重复的元素会被过滤掉，重复添加的元素不是不可以添加，而是不起作用：
+```js
+var s = new Set([1, 2, 3]); // 含1, 2, 3
+s.add(3)
+s; // Set {1, 2, 3}
+s.add(3)
+s; // Set {1, 2, 3}
+```
+同样是通过delete删除元素：
+```js
+s.delete(key);
+```
+
+应用：
+数组去重set简单粗暴：
+```js
+var arr = [1,2,3,3,2,1,5,1];
+let a = [...new Set(arr)]
+console.log(a)
+```
+
+
+### Map和Object的区别
+
+在JavaScript中，Map 和 Object 看起来都是用键值对来存储数据，那么他们有什么不同呢？
+
+不同点
+- Key filed
+
+在 Object 中， key 必须是简单数据类型（整数，字符串或者是 symbol），而在 Map 中则可以是 JavaScript 支持的所有数据类型，也就是说可以用一个 Object 来当做一个Map元素的 key。
+
+- 元素顺序
+
+Map 元素的顺序遵循插入的顺序，而 Object 的则没有这一特性。
+
+- 继承
+
+Map 继承自 Object 对象。
+
+- 新建实例
+
+Object 支持以下几种方法来创建新的实例：
+```js
+var obj = {...};
+var obj = new Object();
+var obj = Object.create(null);
+...
+```
+Map 支持下面这一种构建方法：
+```js
+var map = new Map([[1, 2], [2, 3]]); // map = {1 => 2, 2 => 3}
+
+let map = new Map()
+map.set('key', value); // 添加新的key-value
+```
+
+- 数据访问
+  Map 想要访问元素，可以使用 Map 本身的原生方法：
+```js
+map.get(1) // 2
+```
+Object 可以通过 . 和 [ ] 来访问
+```js
+obj.id;
+obj['id'];
+```
+判断某个元素是否在 Map 中可以使用
+```js
+map.has(1);
+```
+断某个元素是不是在 Object 中需要以下操作：
+```js
+obj.id === undefined;
+// 或者
+'id' in obj;
+```
+:::tip
+另外需要注意的一点是，Object 可以使用 Object.prototype.hasOwnProperty() 来判断某个key是否是这个对象本身的属性，从原型链继承的属性不包括在内。
+:::
+- 新增一个数据
+  Map 可以使用 set() 操作：
+```js
+map.set(key, value)
+// 当传入的 key 已经存在的时候，Map 会覆盖之前的值
+```
+Object 新增一个属性可以使用：
+```js
+obj['key'] = value;
+obj.key = value;
+// object也会覆盖
+
+//vue里面还可以使用$set
+```
+
+- 删除数据
+  在 Object 中没有原生的删除方法，我们可以使用如下方式：
+```js
+delete obj.id;
+// 下面这种做法效率更高
+obj.id = undefined
+
+```
+:::tip
+需要注意的是，使用 delete 会真正的将属性从对象中删除，而使用赋值 undefined 的方式，仅仅是值变成了 undefined。属性仍然在对象上，也就意味着 在使用 for … in… 去遍历的时候，仍然会访问到该属性。
+:::
+Map 有原生的 delete 方法来删除元素：
+```js
+var isDeleteSucceeded = map.delete(1);
+console.log(isDeleteSucceeded ); // true
+// 全部删除
+map.clear();
+
+```
+
+何时使用 Map ，何时使用 Object？
+
+虽然Map 在很多时候优于 Object，但是作为 JavaScript 最基础的数据类型，还是有很多情景更适合使用 Object。
+
+当所要存储的是简单数据类型，并且 key 都为字符串或者整数或者 Symbol 的时候，优先使用 Object ，因为Object可以使用 字符变量 的方式创建，更加高效。
+当需要在单独的逻辑中访问属性或者元素的时候，应该使用 Object，例如：
+```js
+var obj = {
+    id: 1, 
+    name: "It's Me!", 
+    print: function(){ 
+        return `Object Id: ${this.id}, with Name: ${this.name}`;
+    }
+}
+console.log(obj.print());//Object Id: 1, with Name: It's Me.
+// 以上操作不能用 Map 实现
+```
+JSON 直接支持 Object，但不支持 Map;
+Map 是纯粹的 hash， 而 Object 还存在一些其他内在逻辑，所以在执行 delete 的时候会有性能问题。所以写入删除密集的情况应该使用 Map;
+Map 会按照插入顺序保持元素的顺序，而Object做不到;
+Map 在存储大量元素的时候性能表现更好，特别是在代码执行时不能确定 key 的类型的情况;
+
